@@ -1,0 +1,161 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.health.dao.security.UserDao">
+    <resultMap id="userMap" type="UserEntity">
+        <id column="user_id" property="userId"/>
+        <result column="type" property="type"/>
+        <result column="account" property="account"/>
+        <result column="mobile" property="mobile"/>
+        <result column="v_code" property="vCode"/>
+        <result column="v_expire" property="vExpire"/>
+        <result column="password" property="password"/>
+        <result column="slat" property="slat"/>
+        <result column="register_status" property="registerStatus"/>
+        <result column="status" property="status"/>
+        <result column="create_on" property="createOn"/>
+        <result column="create_by" property="createBy"/>
+        <result column="modify_on" property="modifyOn"/>
+        <result column="modify_by" property="modifyBy"/>
+        <result column="version" property="version"/>
+    </resultMap>
+
+    <select id="queryUserEntity" resultMap="userMap">
+        select *  from user where status = 1 and user_id = #{userId} limit 1
+    </select>
+
+    <select id="queryUserByMobile" resultMap="userMap">
+        select *  from user where mobile = #{mobile} and status = 1
+        <choose>
+            <when test="type != null">
+                and type = #{type}
+            </when>
+            <otherwise>
+                and (type is null or type > 1)
+            </otherwise>
+        </choose>
+        limit 1
+    </select>
+
+    <select id="queryUserByAccount" resultMap="userMap">
+        select *  from user where account = #{account} and status = 1
+        <choose>
+            <when test="type != null">
+                and type = #{type}
+            </when>
+            <otherwise>
+                and (type is null or type > 1)
+            </otherwise>
+        </choose>
+        limit 1
+    </select>
+
+    <select id="queryUserByCode" resultMap="userMap">
+        select *  from user where mobile = #{mobile} and v_code = #{vCode} and status = 1
+        <choose>
+            <when test="type != null">
+                and type = #{type}
+            </when>
+            <otherwise>
+                and (type is null or type > 1)
+            </otherwise>
+        </choose>
+        limit 1
+    </select>
+
+    <insert id="createUserEntity" parameterType="UserEntity" useGeneratedKeys="true" keyProperty="userId">
+        insert into user(type, account, mobile, v_code, v_expire, password, slat, register_status, status, create_on, create_by, modify_on, modify_by, version)
+        values (#{type}, #{account}, #{mobile}, #{vCode}, #{vExpire}, #{password}, #{slat}, #{registerStatus}, #{status}, #{createOn}, #{createBy}, #{modifyOn}, #{modifyBy}, #{version})
+    </insert>
+
+    <update id="updateUserEntity" parameterType="UserEntity">
+        update user
+        set
+        user_id=#{userId}
+        <if test="type !=null">,type=#{type}</if>
+        <if test="account !=null">,account=#{account}</if>
+        <if test="mobile !=null">,mobile=#{mobile}</if>
+        <if test="vCode !=null">,v_code=#{vCode}</if>
+        <if test="vExpire !=null">,v_expire=#{vExpire}</if>
+        <if test="password !=null">,password=#{password}</if>
+        <if test="slat !=null">,slat=#{slat}</if>
+        <if test="registerStatus !=null">,register_status=#{registerStatus}</if>
+        <if test="createOn !=null">,create_on=#{createOn}</if>
+        <if test="createBy !=null">,create_by=#{createBy}</if>
+        <if test="modifyOn !=null">,modify_on=#{modifyOn}</if>
+        <if test="modifyBy !=null">,modify_by=#{modifyBy}</if>
+        <if test="version !=null">,version=#{version}</if>
+        where
+        user_id=#{userId}
+    </update>
+
+    <select id="queryListUserTransfer" resultType="com.health.transfer.security.UserTransfer">
+        select u.user_id as userId, u.type, u.account, u.mobile, u.register_status as registerStatus, up.clinic_id as clinicId, up.department_id as departmentId,
+        up.name, up.identifier, up.telephone, up.profession_first as professionFirst, up.profession_second as professionSecond, up.skills, up.pay_online as payOnline,
+        up.pay_telephone as payTelephone, up.pay_out as payOut, up.pre_pay_online as prePayOnline, up.pre_pay_telephone as prePayTelephone, up.pre_pay_out as prePayOut,
+        up.comments, up.sex, up.birthday, up.blood, up.chronic, up.allergy, up.address, up.expirence,
+        d.department_name AS departmentName, c.clinic_name AS clinicName, case when ul.num > 0 then true else false end as online,
+        r.role_id as roleId, r.role_name as roleName
+        from user u left join user_profile up on u.user_id = up.user_id
+        left join department d on up.department_id = d.department_id
+        left join clinic c on up.clinic_id = c.clinic_id
+        left join user_role_map urm on u.user_id = urm.user_id
+        left join role r on urm.role_id = r.role_id
+        left join (select user_id, count(1) as num from user_login where status = 1 and date_add(serial, interval 8 hour) > sysdate() group by user_id) ul on u.user_id = ul.user_id
+        where u.status = 1
+        <if test=" queryBo != null and queryBo.clinicId != null">
+            and up.clinic_id = #{queryBo.clinicId}
+        </if>
+        <if test=" queryBo != null and queryBo.departmentName != null">
+            and d.department_name like concat('%', #{queryBo.departmentName}, '%')
+        </if>
+        <if test=" queryBo != null and queryBo.type != null">
+            and u.type = #{queryBo.type}
+        </if>
+        <if test=" queryBo != null and queryBo.mobile != null">
+            and u.mobile like concat('%', #{queryBo.mobile}, '%')
+        </if>
+        <if test=" queryBo != null and queryBo.name != null">
+            and up.name like concat('%', #{queryBo.name}, '%')
+        </if>
+        <if test=" queryBo != null and queryBo.registerStatus != null">
+            and u.register_status = #{queryBo.registerStatus}
+        </if>
+    </select>
+
+    <select id="queryListScheduleUserTransfer" resultType="com.health.transfer.security.UserTransfer">
+        select distinct u.user_id as userId, u.type, u.account, u.mobile, u.register_status as registerStatus, up.clinic_id as clinicId, up.department_id as departmentId,
+        up.name, up.identifier, up.telephone, up.profession_first as professionFirst, up.profession_second as professionSecond, up.skills, up.pay_online as payOnline,
+        up.pay_telephone as payTelephone, up.pay_out as payOut, up.pre_pay_online as prePayOnline, up.pre_pay_telephone as prePayTelephone, up.pre_pay_out as prePayOut,
+        up.comments, up.sex, up.birthday, up.blood, up.chronic, up.allergy, up.address, up.expirence,
+        d.department_name AS departmentName, c.clinic_name AS clinicName, case when ul.num > 0 then true else false end as online,
+        r.role_id as roleId, r.role_name as roleName
+        from user u left join user_profile up on u.user_id = up.user_id
+        left join schedule s on u.user_id = s.user_id
+        left join department d on up.department_id = d.department_id
+        left join clinic c on up.clinic_id = c.clinic_id
+        left join user_role_map urm on u.user_id = urm.user_id
+        left join role r on urm.role_id = r.role_id
+        left join (select user_id, count(1) as num from user_login where status = 1 and date_add(serial, interval 8 hour) > sysdate() group by user_id) ul on u.user_id = ul.user_id
+        where u.status = 1 and u.type = 3 and u.register_status = 1
+        <if test=" queryBo != null and queryBo.clinicId != null">
+            and up.clinic_id = #{queryBo.clinicId}
+        </if>
+        <if test=" queryBo != null and queryBo.departmentName != null">
+            and d.department_name like concat('%', #{queryBo.departmentName}, '%')
+        </if>
+        <if test=" queryBo != null and queryBo.startDate != null">
+            and s.schedule_date <![CDATA[ >= ]]> #{queryBo.startDate}
+        </if>
+        <if test=" queryBo != null and queryBo.endDate != null">
+            and s.schedule_date <![CDATA[ <= ]]> #{queryBo.endDate}
+        </if>
+        <if test=" queryBo != null and queryBo.name != null">
+            and up.name like concat('%', #{queryBo.name}, '%')
+        </if>
+    </select>
+
+    <update id="deleteUserEntity"  parameterType="java.lang.Long">
+        update user set status = 0 where user_id = #{userId}
+    </update>
+</mapper>

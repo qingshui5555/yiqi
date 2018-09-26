@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!--自动扫描配置文件 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" depends-on="dataSource">
+        <property name="dataSource" ref="dataSource" />
+        <property name="configLocation" value="classpath:config/mybatisV3.xml"/>
+        <property name="typeAliasesPackage" value="com.health.entity;com.health.transfer;" ></property>
+        <property name="mapperLocations">
+            <list><value>classpath*:mapper/**/*.xml</value></list>
+        </property>
+    </bean>
+
+    <bean id="sqlMap" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory" />
+    </bean>
+
+    <!--自动扫描Dao -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer" >
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="basePackage" value="com.health.dao" ></property>
+    </bean>
+
+    <bean id = "clinicService" class="com.health.service.clinic.ClinicService" />
+    <bean id = "departmentService" class="com.health.service.department.DepartmentService" />
+    <bean id = "roleService" class="com.health.service.role.RoleService" />
+    <bean id = "userService" class="com.health.service.security.UserService" />
+    <bean id = "scheduleService" class="com.health.service.schedule.ScheduleService" />
+    <bean id = "applyService" class="com.health.service.apply.ApplyService" />
+    <bean id= "smsService" class="com.health.service.sms.SmsService" />
+    <bean id= "userRecordService" class="com.health.service.security.UserRecordService" />
+    <bean id= "userCommentService" class="com.health.service.security.UserCommentService" />
+</beans>

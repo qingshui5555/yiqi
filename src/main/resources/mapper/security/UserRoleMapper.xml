@@ -1,0 +1,48 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.health.dao.security.UserRoleDao">
+    <resultMap id="userRoleMap" type="UserRoleEntity">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="role_id" property="roleId"/>
+        <result column="status" property="status"/>
+        <result column="create_on" property="createOn"/>
+        <result column="create_by" property="createBy"/>
+        <result column="modify_by" property="modifyBy"/>
+        <result column="modify_on" property="modifyOn"/>
+        <result column="version" property="version"/>
+    </resultMap>
+
+    <insert id="createUserRoleEntity" parameterType="UserRoleEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into user_role_map (user_id, role_id, status, create_on, create_by, modify_on, modify_by, version)
+        values (#{userId}, #{roleId}, #{status}, #{createOn}, #{createBy}, #{modifyOn}, #{modifyBy}, #{version})
+    </insert>
+
+    <update id="updateRoleEntity" parameterType="RoleEntity">
+        update user_profile
+        set
+        version = version + 1
+        <if test="name != null">, name = #{name}</if>
+        <if test="identifier != null">, identifier = #{identifier}</if>
+        <if test="telephone != null">, telephone = #{telephone}</if>
+        <if test="professionFirst != null">, profession_first = #{professionFirst}</if>
+        <if test="professionSecond != null">, profession_second = #{professionSecond}</if>
+        <if test="skills != null">, skills = #{skills}</if>
+        <if test="payOnline != null">, pay_online = #{payOnline}</if>
+        <if test="payTelephone != null">, pay_telephone = #{payTelephone}</if>
+        <if test="payOut != null">, pay_out = #{payOut}</if>
+        <if test="comments != null">, comments = #{comments}</if>
+        <if test="status != null">, status = #{status}</if>
+        <if test="createOn != null">, create_on = #{createOn}</if>
+        <if test="createBy != null">, create_by = #{createBy}</if>
+        <if test="modifyOn != null">, modify_on = #{modifyOn}</if>
+        <if test="modifyBy != null">, modify_by = #{modifyBy}</if>
+        where
+        user_id = #{userId}
+    </update>
+
+    <delete id="deleteByUserId" parameterType="Long">
+        delete from user_role_map where user_id = #{userId}
+    </delete>
+</mapper>

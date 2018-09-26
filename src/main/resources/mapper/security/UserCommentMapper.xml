@@ -1,0 +1,11 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.health.dao.security.UserCommentDao">
+
+    <insert id="createUserCommentEntity" parameterType="UserCommentEntity" useGeneratedKeys="true" keyProperty="comment_id">
+        insert into user_comment (app_user_id, doctor_user_id, comment, status, create_on, create_by, modify_on, modify_by, version)
+        values (#{appUserId}, #{doctorUserId}, #{comment}, #{status}, #{createOn}, #{createBy}, #{modifyOn}, #{modifyBy}, #{version})
+    </insert>
+
+</mapper>

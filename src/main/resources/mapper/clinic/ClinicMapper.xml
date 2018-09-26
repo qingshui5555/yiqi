@@ -1,0 +1,34 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.health.dao.clinic.ClinicDao">
+    <resultMap id="clinicMap" type="ClinicEntity">
+        <id column="clinic_id" property="clinicId"/>
+        <result column="clinic_name" property="clinicName"/>
+        <result column="clinic_addr" property="clinicAddr"/>
+        <result column="clinic_telephone" property="clinicTelephone"/>
+        <result column="status" property="status"/>
+        <result column="create_on" property="createOn"/>
+        <result column="create_by" property="createBy"/>
+        <result column="modify_on" property="modifyOn"/>
+        <result column="modify_by" property="modifyBy"/>
+        <result column="version" property="version"/>
+    </resultMap>
+
+    <select id="selectClinicEntity" resultMap="clinicMap">
+        select * from clinic where clinic_id = #{clinicId} limit 1
+    </select>
+
+    <select id="queryListClinic" resultMap="clinicMap">
+        select c.* from clinic c
+        where c.status = 1
+        <if test=" queryBo != null and queryBo.clinicName != null">
+            and c.clinic_name like concat('%', #{queryBo.clinicName}, '%')
+        </if>
+        <if test=" queryBo != null and queryBo.departmentName != null">
+            and exists (select 1 from department d where c.clinic_id = d.clinic_id and d.department_name like concat('%', #{queryBo.departmentName}, '%'))
+        </if>
+        order by c.clinic_id asc
+    </select>
+
+</mapper>

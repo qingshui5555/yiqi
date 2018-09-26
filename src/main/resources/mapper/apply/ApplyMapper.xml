@@ -1,0 +1,84 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.health.dao.apply.ApplyDao">
+    <resultMap id="applyMap" type="ApplyEntity">
+        <id column="apply_id" property="applyId"/>
+        <result column="app_user_id" property="appUserId"/>
+        <result column="doctor_user_id" property="doctorUserId"/>
+        <result column="user_addr" property="userAddr"/>
+        <result column="user_mobile" property="userMobile"/>
+        <result column="schedule_id" property="scheduleId"/>
+        <result column="schedule_date" property="scheduleDate"/>
+        <result column="audit_status" property="auditStatus"/>
+        <result column="reject_reason" property="rejectReason"/>
+        <result column="status" property="status"/>
+        <result column="create_on" property="createOn"/>
+        <result column="create_by" property="createBy"/>
+        <result column="modify_on" property="modifyOn"/>
+        <result column="modify_by" property="modifyBy"/>
+        <result column="version" property="version"/>
+    </resultMap>
+
+    <insert id="createApplyEntity" parameterType="ApplyEntity" useGeneratedKeys="true" keyProperty="apply_id">
+        insert into out_apply (app_user_id, doctor_user_id, user_addr, user_mobile, schedule_id, schedule_date, audit_status, status, create_on, create_by, modify_on, modify_by, version)
+        values (#{appUserId}, #{doctorUserId}, #{userAddr}, #{userMobile}, #{scheduleId}, #{scheduleDate}, #{auditStatus}, #{status}, #{createOn}, #{createBy}, #{modifyOn}, #{modifyBy}, #{version})
+    </insert>
+
+    <select id="queryListApply" resultMap="applyMap">
+        select * from out_apply where status = 1
+        <if test=" queryBo != null and queryBo.userId != null">
+            and doctor_user_id = #{queryBo.userId}
+        </if>
+        <if test=" queryBo != null and queryBo.startDate != null">
+            and schedule_date <![CDATA[ >= ]]> #{queryBo.startDate}
+        </if>
+        <if test=" queryBo != null and queryBo.endDate != null">
+            and schedule_date <![CDATA[ <= ]]> #{queryBo.endDate}
+        </if>
+        <if test=" queryBo != null and queryBo.auditStatus != null">
+            and audit_status = #{queryBo.auditStatus}
+        </if>
+        <if test=" queryBo != null and queryBo.scheduleId != null">
+            and schedule_id = #{queryBo.scheduleId}
+        </if>
+        order by schedule_date desc
+    </select>
+
+    <select id="queryListApplyExpired" resultMap="applyMap">
+        select * from out_apply where status = 1 and audit_status = 0 and schedule_date <![CDATA[ < ]]> sysdate()
+        <if test=" queryBo != null and queryBo.userId != null">
+            and doctor_user_id = #{queryBo.userId}
+        </if>
+        order by schedule_date desc
+    </select>
+
+    <select id="countApplyEntity" resultType="java.lang.Integer">
+        select count(apply_id) from out_apply where status = 1 and audit_status = 1 and doctor_user_id = #{doctorUserId} and schedule_id = #{scheduleId}
+    </select>
+
+    <update id="updateApplyEntity" parameterType="ApplyEntity">
+        update out_apply
+        set
+        version = version + 1
+        <if test="appUserId != null">, app_user_id = #{appUserId}</if>
+        <if test="doctorUserId != null">, doctor_user_id = #{doctorUserId}</if>
+        <if test="userAddr != null">, user_addr = #{userAddr}</if>
+        <if test="userMobile != null">, user_mobile = #{userMobile}</if>
+        <if test="scheduleId != null">, schedule_id = #{scheduleId}</if>
+        <if test="scheduleDate != null">, schedule_date = #{scheduleDate}</if>
+        <if test="auditStatus != null">, audit_status = #{auditStatus}</if>
+        <if test="rejectReason != null">, reject_reason = #{rejectReason}</if>
+        <if test="status != null">, status = #{status}</if>
+        <if test="createOn != null">, create_on = #{createOn}</if>
+        <if test="createBy != null">, create_by = #{createBy}</if>
+        <if test="modifyOn != null">, modify_on = #{modifyOn}</if>
+        <if test="modifyBy != null">, modify_by = #{modifyBy}</if>
+        where
+        apply_id = #{applyId}
+    </update>
+
+    <select id="selectApplyEntity" resultMap="applyMap">
+        select * from out_apply where apply_id = #{applyId} limit 1
+    </select>
+</mapper>

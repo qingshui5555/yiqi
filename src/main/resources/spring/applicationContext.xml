@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                          http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+                          http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <context:component-scan base-package="com.health"/>
+
+    <tx:annotation-driven transaction-manager="transactionManager" />
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager" depends-on="dataSource">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!-- 配置数据源 -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <!--<property name="url" value="jdbc:mysql://localhost:3307/health"/>-->
+        <!--<property name="username" value="mms"/>-->
+        <!--<property name="password" value="11223344"/>-->
+        <!--<property name="url" value="jdbc:mysql://bj-cdb-f04j0q32.sql.tencentcdb.com:63135/health"/>-->
+        <!--<property name="username" value="root"/>-->
+        <!--<property name="password" value="qingshui5555"/>-->
+        <property name="url" value="jdbc:mysql://sh-cdb-ojda19vq.sql.tencentcdb.com:62972/health"/>
+        <property name="username" value="root"/>
+        <property name="password" value="asb#1234"/>
+        <!--连接池启动时的初始值 -->
+        <property name="initialSize" value="10"/>
+        <!--连接池的最大值 -->
+        <property name="maxActive" value="100"/>
+        <!--最大空闲值.当经过一个高峰时间后，连接池可以慢慢将已经用不到的连接慢慢释放一部        分，一直减少到maxIdle为止 -->
+        <property name="maxIdle" value="50"/>
+        <!--最小空闲值.当空闲的连接数少于阀值时，连接池就会预申请去一些连接，以免洪峰来时        来不及申请 -->
+        <property name="minIdle" value="10"/>
+        <!--给出一条简单的sql语句进行验证 -->
+        <property name="validationQuery" value="select 1 from dual"/>
+        <!--在取出连接时进行有效验证 -->
+        <property name="testOnBorrow" value="true"/>
+        <property name="removeAbandonedTimeout" value="120"/>
+        <property name="removeAbandoned" value="true"/>
+        <!--#运行判断连接超时任务的时间间隔，单位为毫秒，默认为-1，即不执行任务.-->
+        <property name="timeBetweenEvictionRunsMillis" value="3600000"/>
+        <!--#连接的超时时间，默认为半小时。 -->
+        <property name="minEvictableIdleTimeMillis" value="3600000"/>
+    </bean>
+
+</beans>

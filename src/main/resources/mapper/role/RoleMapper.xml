@@ -1,0 +1,57 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.health.dao.role.RoleDao">
+    <resultMap id="roleMap" type="RoleEntity">
+        <id column="role_id" property="roleId"/>
+        <result column="role_name" property="roleName"/>
+        <result column="is_edit" property="isEdit"/>
+        <result column="status" property="status"/>
+        <result column="create_on" property="createOn"/>
+        <result column="create_by" property="createBy"/>
+        <result column="modify_on" property="modifyOn"/>
+        <result column="modify_by" property="modifyBy"/>
+        <result column="version" property="version"/>
+    </resultMap>
+
+    <select id="queryListRole" resultMap="roleMap">
+        select * from role where status = 1
+        <if test=" queryBo != null and queryBo.roleName != null">
+            and role_name like concat('%', #{queryBo.roleName}, '%')
+        </if>
+        order by create_on desc
+    </select>
+
+    <select id="queryListRoleByUserId" resultMap="roleMap">
+        select distinct r.* from role r left join user_role_map urm on r.role_id = urm.role_id
+        where r.status = 1 and urm.user_id = #{userId}
+        order by r.create_on desc
+    </select>
+
+    <select id="selectRoleEntity" resultMap="roleMap">
+        select * from role where status = 1 and role_id = #{roleId} limit 1
+    </select>
+
+    <insert id="createRoleEntity" parameterType="RoleEntity" useGeneratedKeys="true" keyProperty="roleId">
+        insert into role (role_name, status, create_on, create_by, modify_on, modify_by, version)
+        values (#{roleName}, #{status}, #{createOn}, #{createBy}, #{modifyOn}, #{modifyBy}, #{version})
+    </insert>
+
+    <update id="updateRoleEntity" parameterType="RoleEntity">
+        update role
+        set
+        version = version + 1
+        <if test="roleName !=null">, role_name = #{roleName}</if>
+        <if test="status !=null">, status = #{status}</if>
+        <if test="createOn !=null">, create_on = #{createOn}</if>
+        <if test="createBy !=null">, create_by = #{createBy}</if>
+        <if test="modifyOn !=null">, modify_on = #{modifyOn}</if>
+        <if test="modifyBy !=null">, modify_by = #{modifyBy}</if>
+        where
+        role_id = #{roleId} and is_edit = 1
+    </update>
+
+    <update id="deleteRoleEntity" parameterType="java.lang.Long">
+        update role set status = 0 where status = 1 and role_id = #{roleId} and is_edit = 1
+    </update>
+</mapper>

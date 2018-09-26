@@ -1,0 +1,80 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.health.dao.security.UserProfileDao">
+    <resultMap id="userProfileMap" type="UserProfileEntity">
+        <id column="user_id" property="userId"/>
+        <result column="clinic_id" property="clinicId"/>
+        <result column="department_id" property="departmentId"/>
+        <result column="name" property="name"/>
+        <result column="identifier" property="identifier"/>
+        <result column="telephone" property="telephone"/>
+        <result column="profession_first" property="professionFirst"/>
+        <result column="profession_second" property="professionSecond"/>
+        <result column="skills" property="skills"/>
+        <result column="pay_online" property="payOnline"/>
+        <result column="pay_telephone" property="payTelephone"/>
+        <result column="pay_out" property="payOut"/>
+        <result column="pre_pay_online" property="prePayOnline"/>
+        <result column="pre_pay_telephone" property="prePayTelephone"/>
+        <result column="pre_pay_out" property="prePayOut"/>
+        <result column="comments" property="comments"/>
+        <result column="sex" property="sex"/>
+        <result column="birthday" property="birthday"/>
+        <result column="blood" property="blood"/>
+        <result column="chronic" property="chronic"/>
+        <result column="allergy" property="allergy"/>
+        <result column="address" property="address"/>
+        <result column="expirence" property="expirence"/>
+        <result column="status" property="status"/>
+        <result column="create_on" property="createOn"/>
+        <result column="create_by" property="createBy"/>
+        <result column="modify_by" property="modifyBy"/>
+        <result column="modify_on" property="modifyOn"/>
+        <result column="version" property="version"/>
+    </resultMap>
+
+    <select id="queryUserProfileEntity" resultMap="userProfileMap">
+        select * from user_profile where user_id = #{userId} and status = 1
+    </select>
+
+    <insert id="createUserProfileEntity" parameterType="UserProfileEntity" useGeneratedKeys="true" keyProperty="userId">
+        insert into user_profile (user_id, clinic_id, department_id, name, identifier, telephone, profession_first, profession_second, skills, pay_online, pay_telephone, pay_out, pre_pay_online, pre_pay_telephone, pre_pay_out, comments, sex, birthday, blood, chronic, allergy, address, expirence,status, create_on, create_by, modify_on, modify_by, version)
+        values (#{userId}, #{clinicId}, #{departmentId}, #{name}, #{identifier}, #{telephone}, #{professionFirst}, #{professionSecond}, #{skills}, #{payOnline}, #{payTelephone}, #{payOut}, #{prePayOnline}, #{prePayTelephone}, #{prePayOut}, #{comments}, #{sex}, #{birthday}, #{blood}, #{chronic}, #{allergy}, #{address}, #{expirence}, #{status}, #{createOn}, #{createBy}, #{modifyOn}, #{modifyBy}, #{version})
+    </insert>
+
+    <update id="updateUserProfileEntity" parameterType="UserProfileEntity">
+        update user_profile
+        set
+        version = version + 1
+        <if test="name != null">, name = #{name}</if>
+        <if test="clinicId != null">, clinic_id = #{clinicId}</if>
+        <if test="departmentId != null">, department_id = #{departmentId}</if>
+        <if test="identifier != null">, identifier = #{identifier}</if>
+        <if test="telephone != null">, telephone = #{telephone}</if>
+        <if test="professionFirst != null">, profession_first = #{professionFirst}</if>
+        <if test="professionSecond != null">, profession_second = #{professionSecond}</if>
+        <if test="skills != null">, skills = #{skills}</if>
+        <if test="payOnline != null">, pay_online = #{payOnline}</if>
+        <if test="payTelephone != null">, pay_telephone = #{payTelephone}</if>
+        <if test="payOut != null">, pay_out = #{payOut}</if>
+        <if test="prePayOnline != null">, pre_pay_online = #{prePayOnline}</if>
+        <if test="prePayTelephone != null">, pre_pay_telephone = #{prePayTelephone}</if>
+        <if test="prePayOut != null">, pre_pay_out = #{prePayOut}</if>
+        <if test="comments != null">, comments = #{comments}</if>
+        <if test="sex != null">, sex = #{sex}</if>
+        <if test="birthday != null">, birthday = #{birthday}</if>
+        <if test="blood != null">, blood = #{blood}</if>
+        <if test="chronic != null">, chronic = #{chronic}</if>
+        <if test="allergy != null">, allergy = #{allergy}</if>
+        <if test="address != null">, address = #{address}</if>
+        <if test="expirence != null">, expirence = #{expirence}</if>
+        <if test="status != null">, status = #{status}</if>
+        <if test="createOn != null">, create_on = #{createOn}</if>
+        <if test="createBy != null">, create_by = #{createBy}</if>
+        <if test="modifyOn != null">, modify_on = #{modifyOn}</if>
+        <if test="modifyBy != null">, modify_by = #{modifyBy}</if>
+        where
+        user_id = #{userId}
+    </update>
+</mapper>

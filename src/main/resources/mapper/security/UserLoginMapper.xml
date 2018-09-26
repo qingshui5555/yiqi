@@ -1,0 +1,32 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.health.dao.security.UserLoginDao">
+    <resultMap id="userLoginMap" type="UserLoginEntity">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="account" property="account"/>
+        <result column="mobile" property="mobile"/>
+        <result column="token" property="token"/>
+        <result column="serial" property="serial"/>
+        <result column="status" property="status"/>
+        <result column="create_on" property="createOn"/>
+        <result column="create_by" property="createBy"/>
+        <result column="modify_on" property="modifyOn"/>
+        <result column="modify_by" property="modifyBy"/>
+        <result column="version" property="version"/>
+    </resultMap>
+
+    <insert id="insertUserLoginEntity" parameterType="UserLoginEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into user_login(user_id, account, mobile, token, serial, status, create_on, create_by, modify_on, modify_by, version)
+        values (#{userId}, #{account}, #{mobile}, #{token}, #{serial}, #{status}, #{createOn}, #{createBy}, #{modifyOn}, #{modifyBy}, #{version})
+    </insert>
+
+    <select id="countUserLoginEntity" resultType="java.lang.Integer">
+        select count(1) from user_login where status = 1 and user_id = #{userId} and date_add(serial, interval 8 hour) > sysdate()
+    </select>
+
+    <update id="userLogout" parameterType="java.lang.Long">
+        update user_login set status = 0 where status = 1 and user_id = #{userId};
+    </update>
+</mapper>
